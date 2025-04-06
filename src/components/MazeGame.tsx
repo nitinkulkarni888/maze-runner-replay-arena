@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { generateMaze, Direction, isValidMove, getNextPosition } from '@/utils/mazeGenerator';
 import Maze from './Maze';
@@ -7,7 +8,7 @@ import GameStats from './GameStats';
 import { useToast } from "@/components/ui/use-toast";
 
 const MazeGame: React.FC = () => {
-  const [maze, setMaze] = useState(generateMaze(10, 10, 5));
+  const [maze, setMaze] = useState(generateMaze(50, 50, 5));
   const [playerPosition, setPlayerPosition] = useState({ ...maze.start });
   const [recordedMoves, setRecordedMoves] = useState<Direction[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -21,14 +22,21 @@ const MazeGame: React.FC = () => {
   
   const { toast } = useToast();
   
-  // Generate a new maze with adjusted complexity scaling
+  // Generate a new maze with adjusted complexity scaling for larger mazes
   const generateNewMaze = useCallback(() => {
-    // Convert 0-10 scale to appropriate generation parameters
-    // Maze size scales from 5x5 (complexity 0) to 15x15 (complexity 10)
-    const mazeSize = 5 + Math.floor(complexity * 1);
+    // For complexity 10, we want a 50x50 maze
+    // For complexity 0, we start with 5x5
+    const maxSize = 50;
+    const minSize = 5;
+    
+    // Calculate maze size based on complexity (0-10 scale)
+    const sizeScale = complexity / 10;
+    const mazeSize = Math.floor(minSize + (maxSize - minSize) * sizeScale);
     
     // Internal complexity parameter scales from 1 to 10
     const internalComplexity = Math.max(1, complexity);
+    
+    console.log(`Creating maze with size ${mazeSize}x${mazeSize} and complexity ${internalComplexity}`);
     
     const newMaze = generateMaze(mazeSize, mazeSize, internalComplexity);
     setMaze(newMaze);
@@ -178,7 +186,7 @@ const MazeGame: React.FC = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-6 overflow-auto">
             <Maze 
               maze={maze} 
               playerPosition={playerPosition} 

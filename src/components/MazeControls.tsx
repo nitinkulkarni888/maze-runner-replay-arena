@@ -36,6 +36,11 @@ const MazeControls: React.FC<MazeControlsProps> = ({
 
   // Calculate approximate move length based on complexity
   const estimatedMoves = Math.round(complexity * 5);
+  
+  // Calculate approximate maze size
+  const minSize = 5;
+  const maxSize = 50;
+  const approxSize = Math.floor(minSize + (maxSize - minSize) * (complexity / 10));
 
   return (
     <Card className="bg-white border-gray-200">
@@ -66,9 +71,12 @@ const MazeControls: React.FC<MazeControlsProps> = ({
               className="py-2"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Easy (~{Math.round(0 * 5)} moves)</span>
-              <span>Medium (~{Math.round(5 * 5)} moves)</span>
-              <span>Hard (~50 moves)</span>
+              <span>Easy (5x5)</span>
+              <span>Medium (25x25)</span>
+              <span>Hard (50x50)</span>
+            </div>
+            <div className="text-xs text-center text-muted-foreground mt-1">
+              Current: ~{approxSize}x{approxSize} maze, ~{complexity * 5} moves to solve
             </div>
           </div>
           

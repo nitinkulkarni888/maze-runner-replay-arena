@@ -109,9 +109,16 @@ const removeWalls = (current: Cell, next: Cell): void => {
 
 // Generate maze using recursive backtracking algorithm
 export const generateMaze = (width: number, height: number, complexity: number): Maze => {
-  // Adjust size based on complexity
-  const adjustedWidth = Math.max(5, Math.min(15, Math.floor(width * (complexity / 10))));
-  const adjustedHeight = Math.max(5, Math.min(15, Math.floor(height * (complexity / 10))));
+  // Scale maze size based on complexity
+  // For complexity 10, allow up to 50x50
+  const maxSize = 50;
+  const minSize = 5;
+  
+  const sizeMultiplier = complexity / 10;
+  const adjustedWidth = Math.max(minSize, Math.min(maxSize, Math.floor(width * sizeMultiplier)));
+  const adjustedHeight = Math.max(minSize, Math.min(maxSize, Math.floor(height * sizeMultiplier)));
+  
+  console.log(`Generating maze: ${adjustedWidth}x${adjustedHeight} with complexity ${complexity}`);
   
   const grid = createGrid(adjustedWidth, adjustedHeight);
   const stack: Cell[] = [];

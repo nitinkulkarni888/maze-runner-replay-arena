@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Maze as MazeType, Direction } from '@/utils/mazeGenerator';
 
 interface MazeProps {
@@ -10,8 +10,23 @@ interface MazeProps {
 }
 
 const Maze: React.FC<MazeProps> = ({ maze, playerPosition, isPlaying, isSuccess }) => {
-  const cellSize = 40;
-  const wallThickness = 3;
+  // Dynamically calculate cell size based on maze dimensions
+  // For larger mazes (up to 50x50), we use smaller cells
+  const cellSize = useMemo(() => {
+    const baseSize = 40;
+    const maxMazeSize = 50;
+    
+    // Scale down for larger mazes
+    if (maze.width > 15 || maze.height > 15) {
+      // Progressive scaling: larger mazes get smaller cells
+      const scaleFactor = Math.max(maze.width, maze.height) / maxMazeSize;
+      return Math.max(8, Math.floor(baseSize * (1 - scaleFactor * 0.8)));
+    }
+    
+    return baseSize;
+  }, [maze.width, maze.height]);
+  
+  const wallThickness = Math.max(1, Math.floor(cellSize / 10));
   
   const getCellColor = (x: number, y: number) => {
     if (x === maze.start.x && y === maze.start.y) {
@@ -29,8 +44,11 @@ const Maze: React.FC<MazeProps> = ({ maze, playerPosition, isPlaying, isSuccess 
     return 'bg-primary shadow-lg';
   };
   
+  // For large mazes, don't render text labels as they won't fit
+  const showLabels = cellSize >= 20;
+  
   return (
-    <div className="relative overflow-hidden rounded-lg border-2 border-gray-200 shadow-md">
+    <div className="relative overflow-auto rounded-lg border-2 border-gray-200 shadow-md max-w-full max-h-[70vh]">
       <div
         className="relative"
         style={{
@@ -101,32 +119,36 @@ const Maze: React.FC<MazeProps> = ({ maze, playerPosition, isPlaying, isSuccess 
         )}
         
         {/* Start point marker */}
-        <div
-          className="absolute flex items-center justify-center text-xs font-bold text-secondary-foreground"
-          style={{
-            width: `${cellSize}px`,
-            height: `${cellSize}px`,
-            left: `${maze.start.x * cellSize}px`,
-            top: `${maze.start.y * cellSize}px`,
-            zIndex: 10,
-          }}
-        >
-          START
-        </div>
+        {showLabels && (
+          <div
+            className="absolute flex items-center justify-center text-xs font-bold text-secondary-foreground"
+            style={{
+              width: `${cellSize}px`,
+              height: `${cellSize}px`,
+              left: `${maze.start.x * cellSize}px`,
+              top: `${maze.start.y * cellSize}px`,
+              zIndex: 10,
+            }}
+          >
+            START
+          </div>
+        )}
         
         {/* End point marker */}
-        <div
-          className="absolute flex items-center justify-center text-xs font-bold text-accent-foreground"
-          style={{
-            width: `${cellSize}px`,
-            height: `${cellSize}px`,
-            left: `${maze.end.x * cellSize}px`,
-            top: `${maze.end.y * cellSize}px`,
-            zIndex: 10,
-          }}
-        >
-          GOAL
-        </div>
+        {showLabels && (
+          <div
+            className="absolute flex items-center justify-center text-xs font-bold text-accent-foreground"
+            style={{
+              width: `${cellSize}px`,
+              height: `${cellSize}px`,
+              left: `${maze.end.x * cellSize}px`,
+              top: `${maze.end.y * cellSize}px`,
+              zIndex: 10,
+            }}
+          >
+            GOAL
+          </div>
+        )}
         
         {/* Player */}
         <div
