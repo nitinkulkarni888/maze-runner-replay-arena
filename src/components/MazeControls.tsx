@@ -34,6 +34,9 @@ const MazeControls: React.FC<MazeControlsProps> = ({
     onComplexityChange(value[0]);
   };
 
+  // Calculate approximate move length based on complexity
+  const estimatedMoves = Math.round(complexity * 5);
+
   return (
     <Card className="bg-white border-gray-200">
       <CardHeader className={`bg-primary/10 pb-2 ${isMobile ? 'p-3' : ''}`}>
@@ -45,7 +48,7 @@ const MazeControls: React.FC<MazeControlsProps> = ({
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Complexity Level: {complexity}</span>
+              <span className="text-sm font-medium">Complexity: {complexity}/10</span>
               {isSuccess === true && (
                 <div className="flex items-center text-green-600">
                   <Trophy className="h-4 w-4 mr-1 animate-bounce-slight" />
@@ -55,17 +58,17 @@ const MazeControls: React.FC<MazeControlsProps> = ({
             </div>
             <Slider
               defaultValue={[complexity]}
-              min={1}
-              max={20}
+              min={0}
+              max={10}
               step={1}
               onValueChange={handleSliderChange}
               disabled={isPlaying}
               className="py-2"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Easy</span>
-              <span>Medium</span>
-              <span>Hard</span>
+              <span>Easy (~{Math.round(0 * 5)} moves)</span>
+              <span>Medium (~{Math.round(5 * 5)} moves)</span>
+              <span>Hard (~50 moves)</span>
             </div>
           </div>
           

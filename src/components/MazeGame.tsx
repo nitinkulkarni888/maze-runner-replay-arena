@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { generateMaze, Direction, isValidMove, getNextPosition } from '@/utils/mazeGenerator';
 import Maze from './Maze';
@@ -22,9 +21,16 @@ const MazeGame: React.FC = () => {
   
   const { toast } = useToast();
   
-  // Generate a new maze
+  // Generate a new maze with adjusted complexity scaling
   const generateNewMaze = useCallback(() => {
-    const newMaze = generateMaze(10, 10, complexity);
+    // Convert 0-10 scale to appropriate generation parameters
+    // Maze size scales from 5x5 (complexity 0) to 15x15 (complexity 10)
+    const mazeSize = 5 + Math.floor(complexity * 1);
+    
+    // Internal complexity parameter scales from 1 to 10
+    const internalComplexity = Math.max(1, complexity);
+    
+    const newMaze = generateMaze(mazeSize, mazeSize, internalComplexity);
     setMaze(newMaze);
     setPlayerPosition({ ...newMaze.start });
     setRecordedMoves([]);
