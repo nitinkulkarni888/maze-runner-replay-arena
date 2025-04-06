@@ -11,6 +11,7 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Trophy, RefreshCcw, ArrowUpDown } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface MazeControlsProps {
   complexity: number;
@@ -27,18 +28,20 @@ const MazeControls: React.FC<MazeControlsProps> = ({
   isSuccess,
   isPlaying
 }) => {
+  const isMobile = useIsMobile();
+  
   const handleSliderChange = (value: number[]) => {
     onComplexityChange(value[0]);
   };
 
   return (
     <Card className="bg-white border-gray-200">
-      <CardHeader className="bg-primary/10 pb-2">
-        <CardTitle className="text-lg flex items-center">
+      <CardHeader className={`bg-primary/10 pb-2 ${isMobile ? 'p-3' : ''}`}>
+        <CardTitle className={`flex items-center ${isMobile ? 'text-base' : 'text-lg'}`}>
           <ArrowUpDown className="mr-2 h-5 w-5 text-primary" /> Maze Controls
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4">
+      <CardContent className={`pt-4 ${isMobile ? 'p-3' : ''}`}>
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between items-center">
