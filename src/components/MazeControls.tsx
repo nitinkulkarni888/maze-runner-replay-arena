@@ -53,7 +53,7 @@ const MazeControls: React.FC<MazeControlsProps> = ({
             <Slider
               defaultValue={[complexity]}
               min={1}
-              max={10}
+              max={20}
               step={1}
               onValueChange={handleSliderChange}
               disabled={isPlaying}

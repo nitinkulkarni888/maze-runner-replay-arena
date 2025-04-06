@@ -40,7 +40,9 @@ const MazeGame: React.FC = () => {
   
   // Add a move to the recorder
   const handleAddMove = (direction: Direction) => {
-    setRecordedMoves(prev => [...prev, direction]);
+    if (!isPlaying && isSuccess !== false) {
+      setRecordedMoves(prev => [...prev, direction]);
+    }
   };
   
   // Clear all recorded moves
@@ -85,6 +87,24 @@ const MazeGame: React.FC = () => {
   const handleNewGame = () => {
     generateNewMaze();
   };
+  
+  // Handle keyboard events
+  useEffect(() => {
+    const handleKeyboardMove = (event: CustomEvent) => {
+      if (!isPlaying && isSuccess !== false) {
+        const { direction } = event.detail;
+        handleAddMove(direction as Direction);
+      }
+    };
+    
+    // Add the event listener for our custom event
+    document.addEventListener('maze-keyboard-move', handleKeyboardMove as EventListener);
+    
+    // Remove the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('maze-keyboard-move', handleKeyboardMove as EventListener);
+    };
+  }, [isPlaying, isSuccess]);
   
   // Effect for move playback
   useEffect(() => {
