@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { generateMaze, Direction, isValidMove, getNextPosition } from '@/utils/mazeGenerator';
 import Maze from './Maze';
@@ -181,12 +180,14 @@ const MazeGame: React.FC = () => {
   }, [isPlaying, moveIndex, recordedMoves.length, playerPosition, maze, toast]);
   
   return (
-    <div className="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-100">
-      <h1 className="text-3xl font-bold text-center mb-6 text-primary">Maze Runner Replay Arena</h1>
+    <div className="card-vibrant p-6 rounded-xl shadow-xl border-2 border-primary/30">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent animate-glow">
+        🎮 Maze Runner Replay Arena ✨
+      </h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <div className="flex justify-center mb-6 overflow-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <div className="mb-6 h-96 lg:h-[500px]">
             <Maze 
               maze={maze} 
               playerPosition={playerPosition} 
@@ -213,7 +214,7 @@ const MazeGame: React.FC = () => {
           </div>
         </div>
         
-        <div>
+        <div className="lg:col-span-1">
           <MoveRecorder 
             recordedMoves={recordedMoves}
             onAddMove={handleAddMove}

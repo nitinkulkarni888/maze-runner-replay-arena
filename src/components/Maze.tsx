@@ -10,21 +10,26 @@ interface MazeProps {
 }
 
 const Maze: React.FC<MazeProps> = ({ maze, playerPosition, isPlaying, isSuccess }) => {
-  // Dynamically calculate cell size based on maze dimensions
+  // Calculate optimal cell size to fit the maze in the container
   const cellSize = useMemo(() => {
-    const baseSize = 40;
-    const maxMazeSize = 50;
+    // Target container dimensions (accounting for padding and borders)
+    const maxWidth = 600; // Max width for the maze
+    const maxHeight = 400; // Max height for the maze
     
-    // Scale down for larger mazes
-    if (maze.width > 15 || maze.height > 15) {
-      const scaleFactor = Math.max(maze.width, maze.height) / maxMazeSize;
-      return Math.max(8, Math.floor(baseSize * (1 - scaleFactor * 0.8)));
-    }
+    // Calculate cell size based on container constraints
+    const cellWidthByContainer = Math.floor(maxWidth / maze.width);
+    const cellHeightByContainer = Math.floor(maxHeight / maze.height);
     
-    return baseSize;
+    // Use the smaller of the two to ensure it fits in both dimensions
+    const containerBasedSize = Math.min(cellWidthByContainer, cellHeightByContainer);
+    
+    // Ensure minimum size for visibility but cap at reasonable maximum
+    return Math.max(8, Math.min(40, containerBasedSize));
   }, [maze.width, maze.height]);
   
   const wallThickness = Math.max(1, Math.floor(cellSize / 10));
+  const mazeWidth = maze.width * cellSize;
+  const mazeHeight = maze.height * cellSize;
   
   const getCellColor = (x: number, y: number) => {
     if (x === maze.start.x && y === maze.start.y) {
@@ -46,126 +51,130 @@ const Maze: React.FC<MazeProps> = ({ maze, playerPosition, isPlaying, isSuccess 
     return 'bg-gradient-to-br from-foreground/80 to-foreground shadow-sm';
   };
   
-  // For large mazes, don't render text labels as they won't fit
-  const showLabels = cellSize >= 20;
+  // For small cells, don't render text labels as they won't fit
+  const showLabels = cellSize >= 16;
   
   return (
-    <div className="relative overflow-auto rounded-xl border-4 border-primary/30 shadow-2xl max-w-full max-h-[70vh] card-vibrant animate-slide-in-up">
-      <div
-        className="relative bg-gradient-to-br from-card via-secondary/5 to-accent/5"
-        style={{
-          width: `${maze.width * cellSize}px`,
-          height: `${maze.height * cellSize}px`,
-        }}
-      >
-        {/* Grid cells */}
-        {maze.grid.map((row, y) =>
-          row.map((cell, x) => (
+    <div className="w-full h-full flex items-center justify-center p-4">
+      <div className="relative rounded-xl border-4 border-primary/30 shadow-2xl card-vibrant animate-slide-in-up overflow-hidden">
+        <div
+          className="relative bg-gradient-to-br from-card via-secondary/5 to-accent/5"
+          style={{
+            width: `${mazeWidth}px`,
+            height: `${mazeHeight}px`,
+            maxWidth: '100%',
+            maxHeight: '100%',
+          }}
+        >
+          {/* Grid cells */}
+          {maze.grid.map((row, y) =>
+            row.map((cell, x) => (
+              <div
+                key={`cell-${x}-${y}`}
+                className={`absolute ${getCellColor(x, y)} transition-all duration-300`}
+                style={{
+                  width: `${cellSize}px`,
+                  height: `${cellSize}px`,
+                  left: `${x * cellSize}px`,
+                  top: `${y * cellSize}px`,
+                }}
+              >
+                {/* Walls with vibrant styling */}
+                {cell.walls.top && (
+                  <div
+                    className={`absolute ${getWallColor()}`}
+                    style={{
+                      width: `${cellSize}px`,
+                      height: `${wallThickness}px`,
+                      left: '0',
+                      top: '0',
+                    }}
+                  />
+                )}
+                {cell.walls.right && (
+                  <div
+                    className={`absolute ${getWallColor()}`}
+                    style={{
+                      width: `${wallThickness}px`,
+                      height: `${cellSize}px`,
+                      right: '0',
+                      top: '0',
+                    }}
+                  />
+                )}
+                {cell.walls.bottom && (
+                  <div
+                    className={`absolute ${getWallColor()}`}
+                    style={{
+                      width: `${cellSize}px`,
+                      height: `${wallThickness}px`,
+                      left: '0',
+                      bottom: '0',
+                    }}
+                  />
+                )}
+                {cell.walls.left && (
+                  <div
+                    className={`absolute ${getWallColor()}`}
+                    style={{
+                      width: `${wallThickness}px`,
+                      height: `${cellSize}px`,
+                      left: '0',
+                      top: '0',
+                    }}
+                  />
+                )}
+              </div>
+            ))
+          )}
+          
+          {/* Start point marker */}
+          {showLabels && (
             <div
-              key={`cell-${x}-${y}`}
-              className={`absolute ${getCellColor(x, y)} transition-all duration-300`}
+              className="absolute flex items-center justify-center text-xs font-bold text-secondary-foreground animate-bounce-gentle"
               style={{
                 width: `${cellSize}px`,
                 height: `${cellSize}px`,
-                left: `${x * cellSize}px`,
-                top: `${y * cellSize}px`,
+                left: `${maze.start.x * cellSize}px`,
+                top: `${maze.start.y * cellSize}px`,
+                zIndex: 10,
               }}
             >
-              {/* Walls with vibrant styling */}
-              {cell.walls.top && (
-                <div
-                  className={`absolute ${getWallColor()}`}
-                  style={{
-                    width: `${cellSize}px`,
-                    height: `${wallThickness}px`,
-                    left: '0',
-                    top: '0',
-                  }}
-                />
-              )}
-              {cell.walls.right && (
-                <div
-                  className={`absolute ${getWallColor()}`}
-                  style={{
-                    width: `${wallThickness}px`,
-                    height: `${cellSize}px`,
-                    right: '0',
-                    top: '0',
-                  }}
-                />
-              )}
-              {cell.walls.bottom && (
-                <div
-                  className={`absolute ${getWallColor()}`}
-                  style={{
-                    width: `${cellSize}px`,
-                    height: `${wallThickness}px`,
-                    left: '0',
-                    bottom: '0',
-                  }}
-                />
-              )}
-              {cell.walls.left && (
-                <div
-                  className={`absolute ${getWallColor()}`}
-                  style={{
-                    width: `${wallThickness}px`,
-                    height: `${cellSize}px`,
-                    left: '0',
-                    top: '0',
-                  }}
-                />
-              )}
+              🏁
             </div>
-          ))
-        )}
-        
-        {/* Start point marker */}
-        {showLabels && (
+          )}
+          
+          {/* End point marker */}
+          {showLabels && (
+            <div
+              className="absolute flex items-center justify-center text-xs font-bold text-accent-foreground animate-float"
+              style={{
+                width: `${cellSize}px`,
+                height: `${cellSize}px`,
+                left: `${maze.end.x * cellSize}px`,
+                top: `${maze.end.y * cellSize}px`,
+                zIndex: 10,
+              }}
+            >
+              🎯
+            </div>
+          )}
+          
+          {/* Player with enhanced vibrant styling */}
           <div
-            className="absolute flex items-center justify-center text-xs font-bold text-secondary-foreground animate-bounce-gentle"
+            className={`absolute rounded-full ${getPlayerColor()} player-transition transform border-2 border-white/50`}
             style={{
-              width: `${cellSize}px`,
-              height: `${cellSize}px`,
-              left: `${maze.start.x * cellSize}px`,
-              top: `${maze.start.y * cellSize}px`,
-              zIndex: 10,
+              width: `${cellSize * 0.7}px`,
+              height: `${cellSize * 0.7}px`,
+              left: `${playerPosition.x * cellSize + cellSize * 0.15}px`,
+              top: `${playerPosition.y * cellSize + cellSize * 0.15}px`,
+              zIndex: 20,
+              transition: isPlaying ? 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
             }}
           >
-            🏁
+            {/* Player inner glow */}
+            <div className="absolute inset-1 rounded-full bg-white/20 animate-pulse" />
           </div>
-        )}
-        
-        {/* End point marker */}
-        {showLabels && (
-          <div
-            className="absolute flex items-center justify-center text-xs font-bold text-accent-foreground animate-float"
-            style={{
-              width: `${cellSize}px`,
-              height: `${cellSize}px`,
-              left: `${maze.end.x * cellSize}px`,
-              top: `${maze.end.y * cellSize}px`,
-              zIndex: 10,
-            }}
-          >
-            🎯
-          </div>
-        )}
-        
-        {/* Player with enhanced vibrant styling */}
-        <div
-          className={`absolute rounded-full ${getPlayerColor()} player-transition transform border-2 border-white/50`}
-          style={{
-            width: `${cellSize * 0.7}px`,
-            height: `${cellSize * 0.7}px`,
-            left: `${playerPosition.x * cellSize + cellSize * 0.15}px`,
-            top: `${playerPosition.y * cellSize + cellSize * 0.15}px`,
-            zIndex: 20,
-            transition: isPlaying ? 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
-          }}
-        >
-          {/* Player inner glow */}
-          <div className="absolute inset-1 rounded-full bg-white/20 animate-pulse" />
         </div>
       </div>
     </div>
