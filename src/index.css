@@ -111,6 +111,35 @@
   }
 }
 
+/* Ad Container Styles */
+.ad-container {
+  @apply rounded-lg border border-border/20 bg-card/50 p-2;
+  backdrop-filter: blur(10px);
+}
+
+.ad-banner {
+  @apply transition-all duration-300 hover:shadow-lg;
+}
+
+.ad-banner.top {
+  @apply max-h-32 overflow-hidden;
+}
+
+.ad-banner.bottom {
+  @apply max-h-32 overflow-hidden;
+}
+
+.ad-banner.sidebar {
+  @apply max-w-xs;
+}
+
+/* AdSense responsive styles */
+.adsbygoogle {
+  @apply transition-all duration-300;
+}
+
+/* ... keep existing code (Enhanced Animations section and all other styles) */
+
 /* Enhanced Animations */
 @keyframes pulse-success {
   0%, 100% {
